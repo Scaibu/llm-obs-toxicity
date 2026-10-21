@@ -19,6 +19,9 @@ async def lifespan(app: FastAPI):
     yield
 
 
+from python_shared.http.middleware.correlation_middleware import CorrelationAndTelemetryMiddleware
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Toxicity Service",
@@ -30,7 +33,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Prometheus metrics
+    app.add_middleware(CorrelationAndTelemetryMiddleware)
     app.mount("/metrics", make_asgi_app())
 
     # ONNX scorer — model loaded lazily, warmed up in lifespan
